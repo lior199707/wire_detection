@@ -18,7 +18,7 @@ class ImageDatabase:
         with open(config_path, 'r') as file:
             return json.load(file)
 
-    def get_experiment_loader(self, label, experiment_name):
+    def get_experiment_generator(self, label, experiment_name):
         """Returns an ExperimentLoader for a given label and experiment."""
         if label not in self.dataset_config:
             raise ValueError(f"Invalid label '{label}'. Available labels: {list(self.dataset_config.keys())}")
@@ -34,7 +34,7 @@ class ImageDatabase:
         if not os.path.exists(experiment_path):
             raise FileNotFoundError(f"Directory '{experiment_path}' does not exist.")
 
-        return ExperimentLoader(experiment_path)
+        return ExperimentLoader(experiment_path).image_generator()
 
     def all_images_generator(self, label):
         """Generator that yields all images from all experiments of a given label."""
