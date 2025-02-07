@@ -1,0 +1,31 @@
+{
+    "no_wire": {
+        "path": "meat_experiment_frames",
+        "experiments": {
+            "experiment1": "exp1_30012025_10_0_1505",
+            "experiment2": "exp2_30012025_10_01_1510",
+            "experiment3": "exp3_30012025_95_0_1520",
+            "experiment4": "exp4_30012025_9_0_1524",
+            "experiment5": "exp5_30012025_85_0_1530",
+            "experiment6": "exp6_30012025_8_0_1535",
+            "experiment7": "exp7_30012025_75_0_1542",
+            "experiment8": "exp8_30012025_7_0_1550",
+            "experiment9": "exp9_30012025_95_01_1600",
+            "experiment10": "exp10_30012025_9_01_1607",
+            "experiment11": "exp11_30012025_85_01_1615",
+            "experiment12": "exp12_30012025_8_01_1620"
+        }
+    },
+    "wire": {
+        "path": "meat_experiment_wire_frames",
+        "experiments": {
+            "experiment13": "exp13_30012025_7_0_1625",
+            "experiment14": "exp14_30012025_75_0_1628",
+            "experiment15": "exp15_30012025_8_0_1629",
+            "experiment16": "exp16_30012025_85_0_1635",
+            "experiment17": "exp17_30012025_9_0_1639",
+            "experiment18": "exp18_30012025_95_0_1642",
+            "experiment19": "exp19_30012025_10_0_1646"
+        }
+    }
+}
