@@ -7,7 +7,8 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
+from tensorflow.keras.preprocessing.image import load_img, img_to_array # type: ignore
+import torch
 
 
 if __name__ == '__main__':
@@ -57,28 +58,33 @@ if __name__ == '__main__':
     # Efficient vae image reconstruction
     # //////////////////////////////////////////////////////////////////////////////////
     # TODO: efficient vae - model creation
-    images = []
-    for path in dataset.get_image_paths():
-        img = load_img(path, color_mode="grayscale", target_size=(512, 1024))
-        img_array = img_to_array(img) / 255.0  # Normalize
-        images.append(img_array)
+    # gen_func = dataset.get_db_generator_tf()
+    # # Create the TensorFlow dataset
+    # train_data = tf.data.Dataset.from_generator(
+    #     gen_func,  # Use the function returning the generator
+    #     output_signature=tf.TensorSpec(shape=(512, 1024, 1), dtype=tf.float32)  # Adjusted shape
+    # ).shuffle(1000).batch(8)  # Shuffle and batch as needed
+    # EfficientNetVAE.train_model(train_data, len(dataset), num_epochs=1)
 
-    image_data = np.array(images)
-    train_data = tf.data.Dataset.from_tensor_slices(image_data).shuffle(100).batch(8)
-    EfficientNetVAE.train_model(train_data, num_epochs=1)
 
     # TODO: efficient vae - image reconstruction
     # efficient_vae = EfficientNetVAE.load_model()
-    # # Get a test image
-    # test_img = image_data[0:1]  # Single test image
-    #
+    # # # Get a test image
+    # test_dataset = UltrasoundDataset(root_dir, config_file, "wire")
+    # image_paths = test_dataset.get_image_paths()
+    # img = load_img(image_paths[0], color_mode="grayscale", target_size=(512, 1024))
+    # test_img = np.array(img_to_array(img) / 255.0)  # Normalize
+    # #  Add the batch dimension to the input image (shape: (1, 512, 1024, 1))
+    # test_img = np.expand_dims(test_img, axis=0)
+    # print(test_img.shape)
+    # #
     # # Reconstruct
     # recon_img, _, _ = efficient_vae(test_img)
-    #
+    
     # # Convert to NumPy
     # test_img = np.squeeze(test_img)
     # recon_img = np.squeeze(recon_img)
-    #
+    
     # # Display
     # plt.subplot(1, 2, 1)
     # plt.title("Original")
