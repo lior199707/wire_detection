@@ -88,6 +88,6 @@ class ImageDatabase:
         for experiment_dir in label_data[ImageDatabase.EXPERIMENTS].values():
             experiment_path = os.path.join(self.root_path, label_data[ImageDatabase.PATH], experiment_dir)
             if os.path.isdir(experiment_path):
-                res.append(ExperimentLoader(experiment_path).get_image_paths())
+                res += ExperimentLoader(experiment_path).get_image_paths()
         return res
 
