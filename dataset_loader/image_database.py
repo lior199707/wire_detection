@@ -31,6 +31,15 @@ class ImageDatabase:
             raise FileNotFoundError(f"Directory '{experiment_path}' does not exist.")
 
         return ExperimentLoader(experiment_path).image_generator()
+    
+    def get_experiment_generator_tf(self, label, experiment_name, batch_size=8):
+        """Returns an ExperimentLoader for a given label and experiment."""
+        experiment_path = self._validate_data(label, experiment_name)
+
+        if not os.path.exists(experiment_path):
+            raise FileNotFoundError(f"Directory '{experiment_path}' does not exist.")
+
+        return ExperimentLoader(experiment_path).image_generator_tf(batch_size)
 
     def get_experiment_image_paths(self, label, experiment_name):
         experiment_path = self._validate_data(label, experiment_name)
@@ -65,7 +74,7 @@ class ImageDatabase:
 
     def all_images_generator(self, label):
         """Generator that yields all images from all experiments of a given label."""
-        if self._is_valid_label(label):
+        if not self._is_valid_label(label):
             raise ValueError(f"Invalid label '{label}'. Available labels: {list(self.dataset_config.keys())}")
 
         label_data = self.dataset_config[label]
@@ -76,6 +85,22 @@ class ImageDatabase:
                 if os.path.isdir(experiment_path):
                     exp_loader = ExperimentLoader(experiment_path)
                     yield from exp_loader.image_generator()()
+
+        return generator
+    
+    def all_images_generator_tf(self, label, batch_size=8):
+        """Generator that yields all images from all experiments of a given label."""
+        if not self._is_valid_label(label):
+            raise ValueError(f"Invalid label '{label}'. Available labels: {list(self.dataset_config.keys())}")
+
+        label_data = self.dataset_config[label]
+
+        def generator():
+            for experiment_dir in label_data[ImageDatabase.EXPERIMENTS].values():
+                experiment_path = os.path.join(self.root_path, label_data[ImageDatabase.PATH], experiment_dir)
+                if os.path.isdir(experiment_path):
+                    exp_loader = ExperimentLoader(experiment_path)
+                    yield from exp_loader.image_generator_tf(batch_size)()
 
         return generator
 

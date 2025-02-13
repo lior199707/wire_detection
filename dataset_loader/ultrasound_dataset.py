@@ -19,6 +19,7 @@ class UltrasoundDataset(torch.utils.data.Dataset):
         self.config_file = config_file
         self.label = label
         self.experiment_name = experiment_name
+        self.db = ImageDatabase(self.root_dir, self.config_file)
         self.transform = UltrasoundDataset.TRANSFORM if not transform else transform
         self.image_paths = self._load_images_paths()
 
@@ -33,10 +34,20 @@ class UltrasoundDataset(torch.utils.data.Dataset):
         return image
 
     def _load_images_paths(self):
-        db = ImageDatabase(self.root_dir, self.config_file)
         if not self.experiment_name:
-            return db.all_images_paths(self.label)
-        return db.get_experiment_image_paths(self.label, self.experiment_name)
+            return self.db.all_images_paths(self.label)
+        return self.db.get_experiment_image_paths(self.label, self.experiment_name)
 
     def get_image_paths(self):
         return self.image_paths
+    
+    def get_db_generator_tf(self, batch_size=8):
+        if not self.experiment_name:
+            return self.db.all_images_generator_tf(self.label, batch_size)
+        return self.db.get_experiment_generator_tf(self.label, self.experiment_name, batch_size)
+    
+    def get_db_generator(self):
+        if not self.experiment_name:
+            return self.db.all_images_generator(self.label)()
+        return self.db.get_experiment_generator(self.label, self.experiment_name)()
+    
