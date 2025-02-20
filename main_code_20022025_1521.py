@@ -21,7 +21,8 @@ from datetime import datetime  # For timestamped folder
 # New
 import lpips
 from skimage.metrics import peak_signal_noise_ratio as psnr, structural_similarity as ssim
-from piq import FID, IFC
+from piq import FID
+import pywt
 
 ###############################################################################
 # Global Parameters
@@ -110,7 +111,6 @@ class VAEEvaluator:
         self.device = device
         self.lpips_loss = lpips.LPIPS(net="vgg").to(device)  # Perceptual loss
         self.fid_metric = FID().to(device)  # FID Score
-        self.ifc_metric = IFC().to(device)  # IFC Score
 
     @staticmethod
     def mse(original, reconstructed):
@@ -134,10 +134,27 @@ class VAEEvaluator:
         reconstructed_torch = torch.tensor(reconstructed_batch).unsqueeze(1).to(self.device)
         return self.fid_metric(original_torch, reconstructed_torch).item()
     
-    def ifc(self, original, reconstructed):
-        original_torch = torch.tensor(original).unsqueeze(0).unsqueeze(0).to(self.device)
-        reconstructed_torch = torch.tensor(reconstructed).unsqueeze(0).unsqueeze(0).to(self.device)
-        return self.ifc_metric(original_torch, reconstructed_torch).item()
+    @staticmethod
+    def ifc(original, reconstructed):
+        """
+        Compute Information Fidelity Criterion (IFC) based on wavelet coefficients.
+        """
+        def compute_wavelet_coeffs(image):
+            coeffs = pywt.wavedec2(image, 'haar', level=4)
+            return coeffs[0]  # Approximate coefficients
+
+        orig_coeffs = compute_wavelet_coeffs(original)
+        recon_coeffs = compute_wavelet_coeffs(reconstructed)
+
+        # Compute means and variances
+        mu_x, sigma_x = np.mean(orig_coeffs), np.var(orig_coeffs)
+        mu_y, sigma_y = np.mean(recon_coeffs), np.var(recon_coeffs)
+
+        # Mutual information estimation
+        cov_xy = np.cov(orig_coeffs.flatten(), recon_coeffs.flatten())[0, 1]
+        ifc_value = (2 * mu_x * mu_y + 1e-8) * (2 * cov_xy + 1e-8) / ((mu_x**2 + mu_y**2 + 1e-8) * (sigma_x + sigma_y + 1e-8))
+
+        return ifc_value
 
     @staticmethod
     def kl_divergence(mu, logvar):
